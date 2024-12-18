@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - IG-AUP</title>
+    <link rel="stylesheet" href="/styles/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9; /* Light background */
+            color: #333; /* Dark text */
+        }
+
+        header {
+            background-color: #1E3A8A; /* Dark Blue */
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        .reports {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #1E3A8A;
+            text-align: center;
+        }
+
+        .chart-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 2rem auto;
+            text-align: center;
+        }
+
+        .metrics {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+        }
+
+        canvas {
+            margin: 0 auto;
+            display: block;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<header>
+    <h1>Reports</h1>
+</header>
+<div class="reports">
+    <h2>Rejection Analysis</h2>
+    <div class="metrics">
+        <p>Applications Processed: <span id="total-applications"></span></p>
+        <p>Rejected Applications: <span id="rejected-applications"></span></p>
+        <p>Rejection Rate: <span id="rejection-rate"></span>%</p>
+    </div>
+    <div class="chart-container">
+        <canvas id="rejectionRateChart"></canvas>
+    </div>
+</div>
+
+<script>
+    async function fetchRejectionRateData() {
+        try {
+            const response = await fetch('/api/reports/rejection-rate');
+            const data = await response.json();
+
+            const totalApplications = data.totalApplications;
+            const rejectedApplications = data.rejectedApplications;
+            const acceptedApplications = data.acceptedApplications;
+            const notReviewedApplications = data.notReviewedApplications;
+
+            const rejectionRate = ((rejectedApplications / totalApplications) * 100).toFixed(2);
+
+            // Update the metrics
+            document.getElementById('total-applications').textContent = totalApplications;
+            document.getElementById('rejected-applications').textContent = rejectedApplications;
+            document.getElementById('rejection-rate').textContent = rejectionRate;
+
+            // Create the pie chart with enhanced darker colors
+            const ctx = document.getElementById('rejectionRateChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Accepted', 'Rejected', 'Not Reviewed'],
+                    datasets: [{
+                        data: [acceptedApplications, rejectedApplications, notReviewedApplications],
+                        backgroundColor: ['#006400', '#8B0000', '#00008B'], // Dark Green, Dark Red, Dark Blue
+                        borderColor: ['#004d00', '#660000', '#000066'], // Borders with matching dark tones
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#333', // Dark text to match white background
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    const label = tooltipItem.label || '';
+                                    const value = tooltipItem.raw || 0;
+                                    const total = acceptedApplications + rejectedApplications + notReviewedApplications;
+                                    const percentage = ((value / total) * 100).toFixed(2);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error fetching rejection rate data:', error);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', fetchRejectionRateData);
+</script>
+</body>
+</html>

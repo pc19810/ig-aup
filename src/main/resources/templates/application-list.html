@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application List</title>
+    <link rel="stylesheet" href="/styles/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        header {
+            background-color: #1E3A8A; /* Dark Blue */
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .application-list {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        th {
+            background-color: #1E3A8A; /* Dark Blue */
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        a {
+            text-decoration: none;
+            color: #1E3A8A; /* Dark Blue */
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .scrollable-table {
+            max-height: 400px; /* Adjust height as needed */
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .scrollable-table::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .scrollable-table::-webkit-scrollbar-thumb {
+            background-color: #1E3A8A; /* Dark Blue */
+            border-radius: 4px;
+        }
+
+        .scrollable-table::-webkit-scrollbar-track {
+            background-color: #f1f1f1;
+        }
+
+        .go-to-end-button {
+            display: block;
+            margin: 1rem auto;
+            padding: 10px 20px;
+            background-color: #1E3A8A; /* Dark Blue */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .go-to-end-button:hover {
+            background-color: #274785; /* Slightly lighter blue */
+        }
+    </style>
+    <script>
+        function scrollToBottom() {
+            const tableContainer = document.querySelector('.scrollable-table');
+            tableContainer.scrollTop = tableContainer.scrollHeight;
+        }
+    </script>
+</head>
+<body>
+<header>
+    <h1>Application List</h1>
+</header>
+<div class="application-list">
+    <h2 style="color: #1E3A8A; text-align: center;">Customer Applications</h2>
+    <div class="scrollable-table">
+        <table>
+            <thead>
+            <tr>
+                <th>Customer Name</th>
+                <th>Risk Score</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="customer : ${customers}">
+                <td th:text="${customer.name}"></td>
+                <td th:text="${customer.score}"></td>
+                <td th:text="${customer.status}"></td>
+                <td>
+                    <a th:href="'/applications/' + ${customer.id}">View Details</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <button class="go-to-end-button" onclick="scrollToBottom()">Go to End of List</button>
+</div>
+</body>
+</html>
