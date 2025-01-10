@@ -16,4 +16,8 @@ public interface CustomerDAO {
     List<Customer> findCustomersByStatuses(List<String> accepted);
 
     List<Customer> findCustomersByStatus(String notReviewed);
+
+    public void updateCustomerDetails(Long id, Customer updatedCustomer);
+
+    public void insertCustomer(Customer customer);
 }

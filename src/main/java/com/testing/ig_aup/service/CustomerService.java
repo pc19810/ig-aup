@@ -36,12 +36,27 @@ public class CustomerService {
         return customerDao.findCustomersByStatus("Not Reviewed");
     }
 
+    public List<Customer> getAcceptedApplications() {
+        return customerDao.findCustomersByStatus("Accepted");
+    }
+    public List<Customer> getRejectedApplications() {
+        return customerDao.findCustomersByStatus("Rejected");
+    }
+
     public List<Customer> getReviewedApplications() {
         return customerDao.findCustomersByStatuses(List.of("Accepted", "Rejected"));
     }
 
     public long getApplicationsCountByStatus(String status) {
         return customerDao.getApplicationsCountByStatus(status);
+    }
+
+    public void updateCustomerDetails(Long id, Customer updatedCustomer) {
+        customerDao.updateCustomerDetails(id, updatedCustomer);
+    }
+
+    public void addCustomer(Customer newCustomer) {
+        customerDao.insertCustomer(newCustomer);
     }
 }
 

@@ -27,6 +27,10 @@ public class CustomerDAOImpl implements CustomerDAO {
     private static final String FIND_CUSTOMERS_BY_STATUSES = "SELECT * FROM ig_aup.customers WHERE status IN (?)";
     private static final String FIND_CUSTOMER_BY_ID = "SELECT * FROM ig_aup.customers WHERE id = ?";
     private static final String UPDATE_CUSTOMER_STATUS = "UPDATE ig_aup.customers SET status = ? WHERE id = ?";
+    private static final String UPDATE_CUSTOMER_BY_ID = "UPDATE customers SET name = ?, age = ?, occupation = ?, insurance_type = ?, " +
+            "coverage_amount = ?, score = ?, category = ? WHERE id = ?";
+    private static final String INSERT_CUSTOMER = "INSERT INTO customers (name, age, occupation, insurance_type, coverage_amount, score, category, status) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
     @Override
     public List<Customer> findAllCustomers() {
@@ -77,5 +81,38 @@ public class CustomerDAOImpl implements CustomerDAO {
             return customer;
         }
     }
+
+    public void updateCustomerDetails(Long id, Customer updatedCustomer) {
+        jdbcTemplate.update(
+                UPDATE_CUSTOMER_BY_ID,
+                updatedCustomer.getName(),
+                updatedCustomer.getAge(),
+                updatedCustomer.getOccupation(),
+                updatedCustomer.getInsuranceType(),
+                updatedCustomer.getCoverageAmount(),
+                updatedCustomer.getScore(),
+                updatedCustomer.getCategory(),
+                id
+        );
+    }
+
+
+    public void insertCustomer(Customer customer) {
+
+        jdbcTemplate.update(
+                INSERT_CUSTOMER,
+                customer.getName(),
+                customer.getAge(),
+                customer.getOccupation(),
+                customer.getInsuranceType(),
+                customer.getCoverageAmount(),
+                customer.getScore(),
+                customer.getCategory(),
+                customer.getStatus()
+        );
+    }
+
+
+
 }
 

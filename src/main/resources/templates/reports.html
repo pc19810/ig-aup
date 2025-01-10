@@ -3,28 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reports - IG-AUP</title>
+    <title>Reports - ILM</title>
     <link rel="stylesheet" href="/styles/styles.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9; /* Light background */
-            color: #333; /* Dark text */
-        }
 
-        header {
-            background-color: #1E3A8A; /* Dark Blue */
-            color: white;
-            padding: 1rem;
-            text-align: center;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        }
 
-        h1 {
-            margin: 0;
-        }
+
 
         .reports {
             max-width: 900px;
@@ -62,7 +46,8 @@
 </head>
 <body>
 <header>
-    <h1>Reports</h1>
+    <img src="/logo-small.png" alt="Logo" class="logo">
+    <h1 id="product">Insurance Lifecycle Management</h1>
 </header>
 <div class="reports">
     <h2>Rejection Analysis</h2>
@@ -73,6 +58,10 @@
     </div>
     <div class="chart-container">
         <canvas id="rejectionRateChart"></canvas>
+    </div>
+    <div id="application-list" class="application-list" style="display: none; margin-top: 2rem;">
+        <h3 id="list-title"></h3>
+        <ul id="application-details"></ul>
     </div>
 </div>
 
@@ -94,16 +83,30 @@
             document.getElementById('rejected-applications').textContent = rejectedApplications;
             document.getElementById('rejection-rate').textContent = rejectionRate;
 
-            // Create the pie chart with enhanced darker colors
             const ctx = document.getElementById('rejectionRateChart').getContext('2d');
-            new Chart(ctx, {
+
+            // Create linear gradients for each pie slice
+            const gradientAccepted = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientAccepted.addColorStop(0, '#93e4c1'); // Light Green
+            gradientAccepted.addColorStop(1, '#3baea0'); // Dark Green
+
+            const gradientRejected = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientRejected.addColorStop(0, '#ff8585'); // Light Red
+            gradientRejected.addColorStop(1, '#ffebeb'); // Dark Red
+
+            const gradientNotReviewed = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientNotReviewed.addColorStop(0, '#a7bcb9'); // Light Blue
+            gradientNotReviewed.addColorStop(1, '#e0ebeb'); // Dark Blue
+
+            // Create the pie chart
+            const chart = new Chart(ctx, {
                 type: 'pie',
                 data: {
                     labels: ['Accepted', 'Rejected', 'Not Reviewed'],
                     datasets: [{
                         data: [acceptedApplications, rejectedApplications, notReviewedApplications],
-                        backgroundColor: ['#006400', '#8B0000', '#00008B'], // Dark Green, Dark Red, Dark Blue
-                        borderColor: ['#004d00', '#660000', '#000066'], // Borders with matching dark tones
+                        backgroundColor: [gradientAccepted, gradientRejected, gradientNotReviewed],
+                        borderColor: ['#004d00', '#660000', '#000066'], // Border colors
                         borderWidth: 2
                     }]
                 },
@@ -130,6 +133,27 @@
                                 }
                             }
                         }
+                    },
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const segmentIndex = elements[0].index; // Get the clicked segment index
+                            const label = chart.data.labels[segmentIndex]; // Get the label for the clicked segment
+
+                            // Redirect based on the label
+                            switch (label) {
+                                case 'Accepted':
+                                    window.location.href = 'applications?filter=accepted';
+                                    break;
+                                case 'Rejected':
+                                    window.location.href = 'applications?filter=rejected';
+                                    break;
+                                case 'Not Reviewed':
+                                    window.location.href = 'applications?filter=pending';
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
                     }
                 }
             });
@@ -140,5 +164,8 @@
 
     document.addEventListener('DOMContentLoaded', fetchRejectionRateData);
 </script>
+<footer>
+    © 2024 IG-INSURANCE LIFECYCLE MANAGEMENT
+</footer>
 </body>
 </html>

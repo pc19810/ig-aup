@@ -3,8 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - IG-AUP</title>
+    <title>Login - ILM</title>
     <link rel="stylesheet" href="/styles/styles.css">
+    <style>
+        header {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 26x 20px;
+            background: linear-gradient(90deg, #9fd3c7, #385170, #9fd3c7);
+            color: white;
+        }
+
+        h1#product {
+            position: absolute;
+            right: 34%;
+            flex: 1;
+            text-align: center;
+            margin: 0;
+            color: white;
+        }
+    </style>
     <script>
         async function login(event) {
             event.preventDefault(); // Prevent default form submission
@@ -32,8 +52,16 @@
             }
         }
     </script>
+
 </head>
 <body>
+<!-- Header with Logo -->
+<header class="header">
+    <img src="/logo-small.png" alt="Logo" class="logo">
+    <h1 class="product">Insurance Lifecycle Management</h1>
+</header>
+
+<!-- Login Form -->
 <div class="login-container">
     <h1>Login</h1>
     <form id="loginForm" onsubmit="login(event)">

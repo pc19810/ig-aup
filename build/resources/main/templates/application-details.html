@@ -3,16 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Application Details</title>
+    <title>Application Details - ILM</title>
     <link rel="stylesheet" href="/styles/styles.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-        }
-
         header {
             background-color: #4CAF50;
             color: white;
@@ -25,7 +18,7 @@
             max-width: 600px;
             margin: 2rem auto;
             padding: 2rem;
-            background-color: white;
+            background-color: #ececec;
             border-radius: 8px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         }
@@ -56,25 +49,65 @@
 
         .button-group button {
             padding: 10px 20px;
-            margin: 0 10px;
+            margin: 10px 15px;
             border: none;
             border-radius: 6px;
             font-size: 1rem;
             cursor: pointer;
             color: white;
+            font-weight: bold;
+<!--            background: linear-gradient(45deg, #4CAF50, #2E7D32);-->
+            transition: all 0.3s ease;
+        }
+
+        .button-group button:hover {
+            background: #9fd3c7;
+            transform: scale(1.05);
         }
 
         .accept-btn {
-            background-color: #4CAF50;
+            background: linear-gradient(45deg, #4CAF50, #2E7D32);
+        }
+
+        .accept-btn:hover {
+            background: linear-gradient(45deg, #66BB6A, #43A047);
         }
 
         .reject-btn {
-            background-color: #F44336;
+            background: linear-gradient(45deg, #F44336, #C62828);
+        }
+
+        .reject-btn:hover {
+            background: linear-gradient(45deg, #EF5350, #D32F2F);
         }
 
         .disabled-btn {
             background-color: #ccc;
             cursor: not-allowed;
+        }
+
+        .edit-btn {
+            background: #ffbd33;
+        }
+
+        .edit-btn:hover {
+            background: linear-gradient(45deg, #FFC107, #FF9800);
+        }
+
+        .update-btn {
+            background: linear-gradient(45deg, #4CAF50, #2E7D32);
+        }
+
+        .update-btn:hover {
+            background: linear-gradient(45deg, #66BB6A, #43A047);
+        }
+
+        .cancel-btn {
+            background: linear-gradient(45deg, #F44336, #C62828);
+        }
+
+        .cancel-btn:hover {
+            background: linear-gradient(45deg, #EF5350, #D32F2F);
         }
 
         footer {
@@ -83,56 +116,258 @@
             font-size: 0.9rem;
             color: #666;
         }
+
+        input {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .editable {
+            display: none;
+        }
+
+        .editable.show {
+            display: block;
+        }
+
+        .readonly {
+            display: block;
+        }
+
+        .readonly.hide {
+            display: none;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .status-buttons {
+            margin-top: 20px;
+        }
     </style>
     <script>
+        let originalData = {};
+
+        function enableEditing() {
+            // Save original data
+            const fields = document.querySelectorAll('.readonly span');
+            fields.forEach(field => {
+                const key = field.id.replace('field-', '');
+                originalData[key] = field.textContent;
+            });
+
+            // Toggle visibility of readonly and editable fields
+            document.querySelectorAll('.readonly').forEach(el => el.classList.add('hide'));
+            document.querySelectorAll('.editable').forEach(el => el.classList.add('show'));
+
+            // Show Update and Cancel buttons, hide Edit and Accept/Reject/Status buttons
+            document.getElementById('edit-btn').classList.add('hidden');
+            document.getElementById('update-btn').classList.remove('hidden');
+            document.getElementById('cancel-btn').classList.remove('hidden');
+            document.querySelectorAll('.status-buttons').forEach(el => el.classList.add('hidden'));
+        }
+
+        function cancelEditing() {
+            // Revert data
+            Object.keys(originalData).forEach(key => {
+                const span = document.getElementById(`field-${key}`);
+                span.textContent = originalData[key];
+
+                const input = document.getElementById(`input-${key}`);
+                input.value = originalData[key];
+            });
+
+            // Toggle visibility
+            document.querySelectorAll('.readonly').forEach(el => el.classList.remove('hide'));
+            document.querySelectorAll('.editable').forEach(el => el.classList.remove('show'));
+
+            // Hide Update and Cancel buttons, show Edit and Accept/Reject/Status buttons
+            document.getElementById('edit-btn').classList.remove('hidden');
+            document.getElementById('update-btn').classList.add('hidden');
+            document.getElementById('cancel-btn').classList.add('hidden');
+            document.querySelectorAll('.status-buttons').forEach(el => el.classList.remove('hidden'));
+        }
+
+        async function updateDetails(customerId) {
+            const updatedData = {};
+
+            // Debug log: Check customerId
+            console.log('Update button clicked, customer ID:', customerId);
+
+            // Collect updated data from inputs
+            document.querySelectorAll('.editable input').forEach(input => {
+                const key = input.id.replace('input-', '');
+                updatedData[key] = input.value;
+            });
+
+            console.log('Updated Data:', updatedData);
+
+            try {
+                const response = await fetch(`/applications/${customerId}/edit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updatedData),
+                });
+
+                if (response.ok) {
+                    alert('Details updated successfully!');
+                    window.location.reload();
+                } else {
+                    const errorMessage = await response.text();
+                    console.error('Error:', errorMessage);
+                    alert('Failed to update details. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error updating details:', error);
+            }
+        }
+
         async function updateStatus(customerId, status) {
+            console.log(`Called updateStatus with customerId: ${customerId}, status: ${status}`);
+
+            if (!customerId || !status) {
+                console.error('Invalid parameters passed to updateStatus.');
+                return;
+            }
+
             try {
                 const response = await fetch(`/applications/${customerId}/status`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ status })
+                    body: JSON.stringify({ status }),
                 });
 
                 if (response.ok) {
-                    // Reload the page to reflect updated status
+                    alert('Status updated successfully!');
                     window.location.reload();
                 } else {
-                    console.error('Failed to update status:', await response.text());
+                    const errorMessage = await response.text();
+                    console.error('Error:', errorMessage);
+                    alert('Failed to update status. Please try again.');
                 }
             } catch (error) {
                 console.error('Error updating status:', error);
+            }
+        }
+
+        function validateForm() {
+            let isValid = true;
+
+            // Validate name
+            const nameInput = document.getElementById('input-name');
+            if (!isNaN(nameInput.value.trim()) || nameInput.value.trim() === '') {
+                isValid = false;
+                showError(nameInput, 'Name must be a valid string.');
+            } else {
+                clearError(nameInput);
+            }
+
+            // Validate age
+            const ageInput = document.getElementById('input-age');
+            const age = parseInt(ageInput.value.trim(), 10);
+            if (isNaN(age) || age <= 0) {
+                isValid = false;
+                showError(ageInput, 'Age must be a positive integer.');
+            } else {
+                clearError(ageInput);
+            }
+
+            // Validate score
+            const scoreInput = document.getElementById('input-score');
+            const score = parseInt(scoreInput.value.trim(), 10);
+            if (isNaN(score) || score < 0 || score > 100) {
+                isValid = false;
+                showError(scoreInput, 'Score must be between 0 and 100.');
+            } else {
+                clearError(scoreInput);
+            }
+
+            return isValid;
+        }
+
+        function showError(input, message) {
+            input.classList.add('error');
+            const errorElement = input.nextElementSibling;
+            if (errorElement) {
+                errorElement.textContent = message;
+            }
+        }
+
+        function clearError(input) {
+            input.classList.remove('error');
+            const errorElement = input.nextElementSibling;
+            if (errorElement) {
+                errorElement.textContent = '';
+            }
+        }
+
+        function handleSubmit() {
+            if (validateForm()) {
+                alert('Validation passed. Submitting form.');
+            } else {
+                alert('Validation failed. Please fix errors and try again.');
             }
         }
     </script>
 </head>
 <body>
 <header>
-    <h1>Application Details</h1>
+    <img src="/logo-small.png" alt="Logo" class="logo">
+    <h1 id="product">Insurance Lifecycle Management</h1>
 </header>
 <div class="details-container">
     <h2>Customer Information</h2>
-    <p><strong>Name:</strong> <span th:text="${customer.name}"></span></p>
-    <p><strong>Age:</strong> <span th:text="${customer.age}"></span></p>
-    <p><strong>Occupation:</strong> <span th:text="${customer.occupation}"></span></p>
-    <p><strong>Insurance Type:</strong> <span th:text="${customer.insuranceType}"></span></p>
-    <p><strong>Coverage Amount:</strong> <span th:text="${customer.coverageAmount}"></span></p>
-    <p><strong>Score:</strong> <span th:text="${customer.score}"></span></p>
-    <p><strong>Category:</strong> <span th:text="${customer.category}"></span></p>
-    <p><strong>Status:</strong> <span id="status-message" th:text="${customer.status}"></span></p>
+    <div class="readonly">
+        <p><strong>Name:</strong> <span id="field-name" th:text="${customer.name}"></span></p>
+        <p><strong>Age:</strong> <span id="field-age" th:text="${customer.age}"></span></p>
+        <p><strong>Occupation:</strong> <span id="field-occupation" th:text="${customer.occupation}"></span></p>
+        <p><strong>Insurance Type:</strong> <span id="field-insuranceType" th:text="${customer.insuranceType}"></span></p>
+        <p><strong>Coverage Amount:</strong> <span id="field-coverageAmount" th:text="${customer.coverageAmount}"></span></p>
+        <p><strong>Score:</strong> <span id="field-score" th:text="${customer.score}"></span></p>
+        <p><strong>Category:</strong> <span id="field-category" th:text="${customer.category}"></span></p>
+    </div>
+
+    <div class="editable">
+        <p><strong>Name:</strong> <input id="input-name" th:value="${customer.name}" /></p>
+        <p><strong>Age:</strong> <input id="input-age" th:value="${customer.age}" /></p>
+        <p><strong>Occupation:</strong> <input id="input-occupation" th:value="${customer.occupation}" /></p>
+        <p><strong>Insurance Type:</strong> <input id="input-insuranceType" th:value="${customer.insuranceType}" /></p>
+        <p><strong>Coverage Amount:</strong> <input id="input-coverageAmount" th:value="${customer.coverageAmount}" /></p>
+        <p><strong>Score:</strong> <input id="input-score" th:value="${customer.score}" /></p>
+        <p><strong>Category:</strong> <input id="input-category" th:value="${customer.category}" /></p>
+    </div>
+
     <div class="button-group">
-        <!-- Enable Accept/Reject buttons only if the status is 'not reviewed' -->
-        <button type="button" class="accept-btn" th:if="${customer.status == 'not reviewed'}"
-                onclick="updateStatus([[${customer.id}]], 'accepted')">Accept</button>
-        <button type="button" class="reject-btn" th:if="${customer.status == 'not reviewed'}"
-                onclick="updateStatus([[${customer.id}]], 'rejected')">Reject</button>
-        <button type="button" class="disabled-btn" th:if="${customer.status != 'not reviewed'}" disabled
-                th:text="${customer.status}"></button>
+        <button type="button" class="edit-btn" id="edit-btn" onclick="enableEditing()">Edit</button>
+        <button type="button" class="update-btn hidden" id="update-btn" th:onclick="|updateDetails(${customer.id})|">Update</button>
+        <button type="button" class="cancel-btn hidden" id="cancel-btn" onclick="cancelEditing()">Cancel</button>
+
+        <div class="status-buttons">
+            <!-- Accept/Reject Buttons -->
+            <button type="button" class="accept-btn"
+                    th:if="${customer.status == 'Not Reviewed'}"
+                    th:onclick="|updateStatus(${customer.id}, 'Accepted')|">Accept</button>
+            <button type="button" class="reject-btn"
+                    th:if="${customer.status == 'Not Reviewed'}"
+                    th:onclick="|updateStatus(${customer.id}, 'Rejected')|">Reject</button>
+
+            <!-- Disabled Button -->
+            <button type="button" class="disabled-btn" th:if="${customer.status != 'Not Reviewed'}" disabled
+                    th:text="${customer.status}"></button>
+        </div>
     </div>
 </div>
 <footer>
-    © 2024 IG-AUP Application
+    © 2024 IG-INSURANCE LIFECYCLE MANAGEMENT
 </footer>
 </body>
 </html>

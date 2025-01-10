@@ -29,6 +29,10 @@ public class ApplicationController {
             customers = customerService.getPendingApplications(); // Not reviewed
         } else if ("completed".equalsIgnoreCase(filter)) {
             customers = customerService.getReviewedApplications(); // Accepted or Rejected
+        } else if ("accepted".equalsIgnoreCase(filter)) {
+            customers = customerService.getAcceptedApplications(); // All applications
+        } else if ("rejected".equalsIgnoreCase(filter)) {
+            customers = customerService.getRejectedApplications();
         } else {
             customers = customerService.getAllCustomers(); // All applications
         }
@@ -45,6 +49,11 @@ public class ApplicationController {
         return "application-details";
     }
 
+    @GetMapping("/add-application")
+    public String showAddApplicationPage() {
+        return "add-application";
+    }
+
     @PostMapping("/{id}/status")
     @ResponseBody
     public ResponseEntity<Void> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
@@ -53,8 +62,21 @@ public class ApplicationController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/{id}/edit")
+    @ResponseBody
+    public ResponseEntity<Void> editCustomer(@PathVariable Long id, @RequestBody Customer updatedCustomer) {
+        System.out.println("Received updated data for customer ID: " + id);
+        System.out.println("Updated Customer Data: " + updatedCustomer);
+
+        customerService.updateCustomerDetails(id, updatedCustomer);
+        return ResponseEntity.ok().build();
+    }
 
 
+    @PostMapping("/add")
+    public ResponseEntity<Void> addCustomer(@RequestBody Customer newCustomer) {
+        customerService.addCustomer(newCustomer);
+        return ResponseEntity.ok().build();
+    }
 
 }
-

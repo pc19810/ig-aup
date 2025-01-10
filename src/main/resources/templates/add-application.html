@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Application - ILM</title>
+    <link rel="stylesheet" href="/styles/styles.css">
+    <style>
+
+        header {
+            background-color: #1E3A8A;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #1E3A8A;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus {
+            border-color: #1E3A8A;
+            outline: none;
+            box-shadow: 0 0 5px rgba(30, 58, 138, 0.5);
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .save-button {
+            background-color: #142d4c;
+        }
+
+        .save-button:hover {
+            background-color: #9fd3c7;
+        }
+
+        .cancel-button {
+            background-color: #DC3545;
+        }
+
+        .cancel-button:hover {
+            background-color: #B02A37;
+        }
+
+        .error-message {
+            color: red;
+            display: none;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <img src="/logo-small.png" alt="Logo" class="logo">
+    <h1 id="product">Insurance Lifecycle Management</h1>
+</header>
+
+<div class="container">
+    <h2>Add New Application</h2>
+
+    <form id="addCustomerForm">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <small class="error-message" id="name-error">Name must contain only letters.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="age">Age:</label>
+            <input type="number" id="age" name="age" required>
+            <small class="error-message" id="age-error">Age must be a positive integer.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="occupation">Occupation:</label>
+            <input type="text" id="occupation" name="occupation" required>
+        </div>
+
+        <div class="form-group">
+            <label for="insuranceType">Insurance Type:</label>
+            <select id="insuranceType" name="insuranceType" required>
+                <option value="">--Select--</option>
+                <option value="Health Insurance">Health</option>
+                <option value="Life Insurance">Life</option>
+                <option value="Auto Insurance">Auto</option>
+                <option value="Home Insurance">Home</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="coverageAmount">Coverage Amount:</label>
+            <input type="number" id="coverageAmount" name="coverageAmount" required>
+        </div>
+
+        <div class="form-group">
+            <label for="score">Score:</label>
+            <input type="number" id="score" name="score" required>
+            <small class="error-message" id="score-error">Score must be between 0 and 100.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="category">Category:</label>
+            <select id="category" name="category" required>
+                <option value="">--Select--</option>
+                <option value="Standard">Standard</option>
+                <option value="Elite">Elite</option>
+                <option value="Preferred">Preferred</option>
+            </select>
+        </div>
+
+        <div class="button-container">
+            <button type="submit" class="button save-button">Add Application</button>
+            <button type="button" class="button cancel-button" onclick="window.location.href='/applications'">Cancel</button>
+        </div>
+    </form>
+</div>
+<script>
+    document.getElementById("addCustomerForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const nameInput = document.getElementById("name");
+        const nameError = document.getElementById("name-error");
+        const ageInput = document.getElementById("age");
+        const ageError = document.getElementById("age-error");
+        const scoreInput = document.getElementById("score");
+        const scoreError = document.getElementById("score-error");
+
+        let isValid = true;
+
+        // Validate name
+        if (!/^[a-zA-Z\s]+$/.test(nameInput.value)) {
+            nameError.style.display = "block";
+            isValid = false;
+        } else {
+            nameError.style.display = "none";
+        }
+
+        // Validate age
+        const ageValue = parseInt(ageInput.value);
+        if (isNaN(ageValue) || ageValue <= 0) {
+            ageError.style.display = "block";
+            isValid = false;
+        } else {
+            ageError.style.display = "none";
+        }
+
+        // Validate score
+        const scoreValue = parseInt(scoreInput.value);
+        if (scoreValue < 0 || scoreValue > 100) {
+            scoreError.style.display = "block";
+            isValid = false;
+        } else {
+            scoreError.style.display = "none";
+        }
+
+        if (!isValid) {
+            return;
+        }
+
+        const formData = {
+            name: nameInput.value,
+            age: ageValue,
+            occupation: document.getElementById("occupation").value,
+            insuranceType: document.getElementById("insuranceType").value,
+            coverageAmount: parseFloat(document.getElementById("coverageAmount").value),
+            score: scoreValue,
+            category: document.getElementById("category").value,
+            status: "Not Reviewed", // Default status for a new application
+        };
+
+        try {
+            const response = await fetch("/applications/add", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (response.ok) {
+                alert("Application added successfully!");
+                window.location.href = "/applications";
+            } else {
+                alert("Failed to add application. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error adding application:", error);
+            alert("An error occurred. Please try again.");
+        }
+    });
+</script>
+
+</body>
+</html>
