@@ -45,6 +45,14 @@
             fetchUserProfile();
             fetchApplicationStats();
         });
+
+        function logout() {
+            fetch('/logout', { method: 'POST' })
+                .then(() => {
+                    window.location.href = '/login';
+                })
+                .catch(err => console.error('Error logging out:', err));
+        }
     </script>
     <style>
         body {
@@ -120,7 +128,7 @@
     <div class="logo-container">
         <img src="/logo-small.png" alt="Logo">
     </div>
-    <h1 id="product">Insurance Lifecycle Management</h1>
+    <h1 id="product">UnderWrite360</h1>
     <div class="user-actions">
         <button class="logout-button" onclick="logout()">Logout</button>
     </div>
@@ -144,7 +152,7 @@
     </div>
 </div>
 <footer>
-    © 2024 IG-INSURANCE LIFECYCLE MANAGEMENT
+    © 2024 IG-UnderWrite360
 </footer>
 </body>
 </html>
